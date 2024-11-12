@@ -55,4 +55,8 @@ class PetOwner extends Authenticatable
     public function pets() : HasMany {
         return $this->hasMany(Pet::class);
     }
+
+    public function notificationsTokens() : HasMany {
+        return $this->hasMany(NotificationTokens::class);
+    }
 }

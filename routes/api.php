@@ -7,6 +7,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\MedicationNameController;
 use App\Http\Controllers\MedicationTypeController;
+use App\Http\Controllers\NotificationTokenController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\VeterinarianController;
@@ -34,6 +35,7 @@ Route::post('petowner/register', [PetOwnerAuthController::class, 'register']);
 Route::post('petowner/login', [PetOwnerAuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function() {
+
     // VETERINARIANS
     Route::post('veterinarian/profile', [VeterinarianAuthController::class, 'profile']);
     Route::post('veterinarian/logout', [VeterinarianAuthController::class, 'logout']);
@@ -101,4 +103,14 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('events/{event}', [EventController::class, 'show']);
     Route::put('events/{event}', [EventController::class, 'update']);
     Route::delete('events/{event}', [EventController::class, 'destroy']);
+
+      // NOTIFICATION TOKENS
+    Route::get('notification-tokens', [NotificationTokenController::class, 'index']);
+    Route::post('notification-tokens', [NotificationTokenController::class, 'store']);
+    Route::get('notification-tokens/{token}', [NotificationTokenController::class, 'show']);
+    // Route::delete('notification-tokens/{token}', [NotificationTokenController::class, 'destroy']);
+    Route::delete('notification-tokens/{token}', [NotificationTokenController::class, 'destroy']);
+    Route::get('/notification/by-address', [NotificationTokenController::class, 'getByAddress']);
+    Route::post('/send-notif', [NotificationTokenController::class, 'sendNotification']);
+
 });

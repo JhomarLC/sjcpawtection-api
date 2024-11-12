@@ -13,11 +13,22 @@ class MedicationNameController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(MedicationType $medtype)
+    public function index(Request $request, MedicationType $medtype)
     {
-        $mednames = $medtype->mednames()->get();
+        // Start a query on the mednames relationship
+        $query = $medtype->mednames();
+
+        // Check if 'status' query parameter is present and not empty
+        if ($request->has('status') && in_array($request->status, ['active', 'inactive'])) {
+            $query->where('status', $request->status);
+        }
+
+        // Get the filtered or unfiltered results
+        $mednames = $query->get();
+
         return MedicationNameResource::collection($mednames);
     }
+
 
     /**
      * Store a newly created resource in storage.

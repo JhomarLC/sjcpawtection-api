@@ -8,15 +8,23 @@ use Illuminate\Http\Request;
 
 class MedicationTypeController extends Controller
 {
-    /**
+   /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $medicationTypes = Medicationtype::paginate(10);
+        $query = Medicationtype::query();
+
+        // Check if 'status' query parameter is present and not empty
+        if ($request->has('status') && in_array($request->status, ['active', 'inactive'])) {
+            $query->where('status', $request->status);
+        }
+
+        // Paginate the filtered or unfiltered results
+        $medicationTypes = $query->paginate(10);
+
         return MedicationTypeResource::collection($medicationTypes);
     }
-
     /**
      * Store a newly created resource in storage.
      */
