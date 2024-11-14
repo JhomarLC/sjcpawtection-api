@@ -33,9 +33,8 @@ class PetOwnerController extends Controller
                     ->orWhere('email', 'like', '%' . $search . '%');
             });
         }
-
         return PetOwnerResource::collection(
-            $pet_owner_query->paginate(10)
+            $pet_owner_query->latest()->get(),
         );
     }
 

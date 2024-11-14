@@ -20,10 +20,10 @@ return new class extends Migration
             $table->foreignIdFor(Pet::class);
             $table->foreignIdFor(Veterinarians::class);
             $table->string('batch_number');
-            $table->string('fee')->default('0');
+            $table->integer('fee')->default(0);
             $table->date('expiry_date');
-            $table->date('next_vaccination');
-            $table->timestamp('medication_date')->useCurrent();
+            $table->date('next_vaccination')->nullable();
+            $table->date('medication_date')->useCurrent();
             $table->enum('remarks', ['Walk-In', 'Mass']);
             $table->enum('or_number', ['Registered', 'Unregistered']);
             $table->timestamps();

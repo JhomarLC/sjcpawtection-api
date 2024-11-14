@@ -26,6 +26,7 @@ class EventController extends Controller
 
         return EventResource::collection(
             $event_query->get()
+            // $event_query->paginate(10)
         );
     }
 

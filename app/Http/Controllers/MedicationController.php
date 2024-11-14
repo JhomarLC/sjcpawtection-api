@@ -43,7 +43,7 @@ class MedicationController extends Controller
             'next_vaccination' => 'nullable|date',
             'remarks' => 'required|string|max:100',
             'or_number' => 'required|string|max:100',
-            'fee' => 'nullable|string|max:100',
+            'fee' => 'nullable|integer',
         ]);
 
         $pet_medications = $pet->medications()->create([

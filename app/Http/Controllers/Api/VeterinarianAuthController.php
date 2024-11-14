@@ -59,6 +59,29 @@ class VeterinarianAuthController extends Controller
         ], 201);
     }
 
+    // public function login(Request $request)
+    // {
+    //     $request->validate([
+    //         'email' => 'required|string|email|max:255',
+    //         'password' => 'required',
+    //     ]);
+
+    //     if(!Auth::guard('vet')->attempt($request->only(['email', 'password']))){
+    //         return response()->json([
+    //             'message' => 'Email and Password invalid!',
+    //         ], 401);
+    //     }
+
+    //     $veterinarian = Veterinarians::where('email', $request->email)->first();
+
+    //     return response()->json([
+    //         'message' => 'Veterinarian Logged In successfully!',
+    //         'user' => $veterinarian,
+    //         'api_token' => $veterinarian->createToken("API TOKEN")->plainTextToken
+    //     ], 201);
+
+    // }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -66,7 +89,7 @@ class VeterinarianAuthController extends Controller
             'password' => 'required',
         ]);
 
-        if(!Auth::guard('vet')->attempt($request->only(['email', 'password']))){
+        if (!Auth::guard('vet')->attempt($request->only(['email', 'password']))) {
             return response()->json([
                 'message' => 'Email and Password invalid!',
             ], 401);
@@ -74,14 +97,19 @@ class VeterinarianAuthController extends Controller
 
         $veterinarian = Veterinarians::where('email', $request->email)->first();
 
+        // Check if the veterinarian's status is approved
+        if ($veterinarian->status !== 'approved') {
+            return response()->json([
+                'message' => 'Your account is pending and requires administrator approval.',
+            ], 403);
+        }
+
         return response()->json([
             'message' => 'Veterinarian Logged In successfully!',
             'user' => $veterinarian,
             'api_token' => $veterinarian->createToken("API TOKEN")->plainTextToken
         ], 201);
-
     }
-
 
     public function profile()
     {
