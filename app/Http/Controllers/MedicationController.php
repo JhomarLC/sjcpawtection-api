@@ -7,25 +7,36 @@ use App\Http\Resources\MedicationResource;
 use App\Models\MedicationName;
 use App\Models\Medications;
 use App\Models\Pet;
+use App\Models\PetOwner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class MedicationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index(Pet $pet)
+    public function index(Request $request, Pet $pet)
     {
-        $medications = $pet->medications()->latest()->get();
+        $search = $request->query('search');
 
-        if ($medications->count() === 0) {
-            return response()->json([
-                'error' => 'No medications found for this pet'
-            ], 404);
+        // Start building the medications query
+        $medications = $pet->medications()->latest();
+
+        // Apply search filter if provided
+        if (!empty($search)) {
+            $medications->where(function($query) use ($search) {
+                $query->whereHas('medicationname', function($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%');
+                })
+                ->orWhere('remarks', 'like', '%' . $search . '%');
+            });
         }
-        $medications->load('pet', 'medicationname', 'veterinarian');
 
+        // Eager load relationships
+        $medications->with('pet', 'medicationname', 'veterinarian');
+
+        // Retrieve the medications
+        $medications = $medications->get();
+
+        // Return the medication resources as a collection
         return MedicationResource::collection($medications);
     }
 

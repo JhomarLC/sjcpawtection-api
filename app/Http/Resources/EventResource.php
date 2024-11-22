@@ -14,7 +14,30 @@ class EventResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            "id" => $this->id,
+            "name" => $this->name,
+            "date_time" => $this->date_time,
+            "place" => $this->place,
+            "status" => $this->getStatus(),
+            "description" => $this->description,
+            "created_at" => $this->created_at,
+            "updated_at" => $this->updated_at
+        ];
+    }
+    /**
+     * Determine the status of the event based on the current date and time.
+     *
+     * @return string
+     */
+    protected function getStatus(): string
+    {
+        $currentDateTime = now(); // Current date and time
+        if ($this->date_time > $currentDateTime) {
+            return "Upcoming";
+        } else {
+            return "Done";
+        }
     }
 }
 

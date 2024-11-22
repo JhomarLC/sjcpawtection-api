@@ -15,17 +15,28 @@ class MedicationNameController extends Controller
      */
     public function index(Request $request, MedicationType $medtype)
     {
+        $search = $request->query('search');
         // Start a query on the mednames relationship
         $query = $medtype->mednames();
+
+
+        if (!empty($search)) {
+            $query->where(function($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('status', $search);
+            });
+        }
 
         // Check if 'status' query parameter is present and not empty
         if ($request->has('status') && in_array($request->status, ['active', 'inactive'])) {
             $query->where('status', $request->status);
         }
 
-        // Get the filtered or unfiltered results
-        $mednames = $query->get();
 
+        // Get the filtered or unfiltered results
+        $mednames = $query->latest()->get();
+
+        $mednames->load('medtype');
         return MedicationNameResource::collection($mednames);
     }
 

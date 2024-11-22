@@ -13,7 +13,16 @@ class MedicationTypeController extends Controller
      */
     public function index(Request $request)
     {
+        $search = $request->query('search');
+
         $query = Medicationtype::query();
+
+        if (!empty($search)) {
+            $query->where(function($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('status', $search);
+            });
+        }
 
         // Check if 'status' query parameter is present and not empty
         if ($request->has('status') && in_array($request->status, ['active', 'inactive'])) {
@@ -21,10 +30,11 @@ class MedicationTypeController extends Controller
         }
 
         // Paginate the filtered or unfiltered results
-        $medicationTypes = $query->paginate(10);
+        $medicationTypes = $query->latest()->get();
 
         return MedicationTypeResource::collection($medicationTypes);
     }
+
     /**
      * Store a newly created resource in storage.
      */

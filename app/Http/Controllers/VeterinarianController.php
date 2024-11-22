@@ -12,22 +12,44 @@ class VeterinarianController extends Controller
     /**
      * Display a listing of the resource.
      */
+   /**
+     * Display a listing of the resource.
+     */
     public function index(Request $request)
     {
         $search = $request->query('search');
+        $count = $request->query('count');
+        $statusFilter = $request->query('status'); // Parameter for status filtering
 
-        $vet = Veterinarians::orderBy('created_at')->latest();
+        // Base query for listing veterinarians
+        $vetQuery = Veterinarians::query()->orderBy('created_at', 'desc');
 
+        // Apply search filter
         if (!empty($search)) {
-            $vet->where('name', 'like', '%' . $search . '%')
-                ->orWhere('email', 'like', '%' . $search . '%')
-                ->orWhere('license_number', 'like', '%' . $search . '%');
+            $vetQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('email', 'like', '%' . $search . '%')
+                    ->orWhere('license_number', 'like', '%' . $search . '%')
+                    ->orWhere('status', $search);
+            });
         }
 
-        // Return the paginated results as a resource collection
-        return VeterinariansResource::collection(
-            $vet->paginate()
-        );
+        // Apply status filter
+        if (!empty($statusFilter) && in_array($statusFilter, ['pending', 'approved', 'archived'])) {
+            $vetQuery->where('status', $statusFilter);
+        }
+
+        // Get the filtered count
+        $filteredCount = $vetQuery->count();
+
+        // Get the filtered data with pagination
+        $filteredData = $vetQuery->paginate();
+
+        // Return both the filtered data and the count
+        return response()->json([
+            'data' => VeterinariansResource::collection($filteredData),
+            'filtered_count' => $filteredCount,
+        ]);
     }
 
     /**

@@ -21,11 +21,16 @@ class EventController extends Controller
             $event_query->where(function($query) use ($search) {
                 $query->where('name', 'like', '%' . $search . '%')
                     ->orWhere('place', 'like', '%' . $search . '%');
+                if ($search === 'upcoming') {
+                    $query->orWhere('date_time', '>', now()); // Filter for upcoming
+                } elseif ($search === 'done') {
+                    $query->orWhere('date_time', '<=', now()); // Filter for done
+                }
             });
         }
 
         return EventResource::collection(
-            $event_query->get()
+            $event_query->latest()->get()
             // $event_query->paginate(10)
         );
     }

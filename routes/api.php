@@ -1,16 +1,21 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CodeCheckController;
+use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\PetOwnerAuthController;
+use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\VeterinarianAuthController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\MedicationNameController;
 use App\Http\Controllers\MedicationTypeController;
+use App\Http\Controllers\NotificationsHistoryController;
 use App\Http\Controllers\NotificationTokenController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\VeterinarianController;
+use App\Http\Controllers\VetNotificationTokenController;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
@@ -34,8 +39,8 @@ Route::post('veterinarian/login', [VeterinarianAuthController::class, 'login']);
 Route::post('petowner/register', [PetOwnerAuthController::class, 'register']);
 Route::post('petowner/login', [PetOwnerAuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function() {
 
+Route::middleware('auth:sanctum')->group(function() {
     // VETERINARIANS
     Route::post('veterinarian/profile', [VeterinarianAuthController::class, 'profile']);
     Route::post('veterinarian/logout', [VeterinarianAuthController::class, 'logout']);
@@ -55,9 +60,12 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('petowners', [PetOwnerController::class, 'index']);
     Route::get('petowners/{petowner}', [PetOwnerController::class, 'show']);
     Route::post('petowners/{petowner}', [PetOwnerController::class, 'update']);
+    Route::get('petowners-all-data', [PetOwnerController::class, 'getPetOwnersWithPetsAndMedications']);
 
     // PET
     Route::get('petowners/{petowner}/pets', [PetController::class, 'index']);
+    Route::get('getchart', [PetController::class, 'indexchart']);
+    Route::get('getchart2', [PetController::class, 'indexchart2']);
     Route::post('petowners/{petowner}/pets', [PetController::class, 'store']);
     Route::get('petowners/{petowner}/pets/{pet}', [PetController::class, 'show']);
 
@@ -112,5 +120,19 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::delete('notification-tokens/{token}', [NotificationTokenController::class, 'destroy']);
     Route::get('/notification/by-address', [NotificationTokenController::class, 'getByAddress']);
     Route::post('/send-notif', [NotificationTokenController::class, 'sendNotification']);
+
+    // NOTIFICATION TOKENS
+    Route::get('vet-notification-tokens', [VetNotificationTokenController::class, 'index']);
+    Route::post('vet-notification-tokens', [VetNotificationTokenController::class, 'store']);
+    Route::get('vet-notification-tokens/{token}', [VetNotificationTokenController::class, 'show']);
+    // Route::delete('notification-tokens/{token}', [VetNotificationTokenController::class, 'destroy']);
+    Route::delete('vet-notification-tokens/{token}', [VetNotificationTokenController::class, 'destroy']);
+    Route::get('/vet-notification/by-address', [VetNotificationTokenController::class, 'getByAddress']);
+    Route::post('/vet-send-notif', [VetNotificationTokenController::class, 'sendNotification']);
+
+
+
+    Route::get('notification-history', [NotificationsHistoryController::class, 'index']);
+    Route::post('notification-history', [NotificationsHistoryController::class, 'store']);
 
 });
