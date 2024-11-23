@@ -1,21 +1,27 @@
 <?php
 
+use App\Http\Controllers\Auth\PetOwnerForgotPasswordController;
+use App\Http\Controllers\Auth\PetOwnerResetPasswordController;
 use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\CodeCheckController;
-use App\Http\Controllers\Api\ForgotPasswordController;
+// use App\Http\Controllers\Api\CodeCheckController;
+// use App\Http\Controllers\Api\ForgotPasswordController;
 use App\Http\Controllers\Api\PetOwnerAuthController;
-use App\Http\Controllers\Api\ResetPasswordController;
+// use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\VeterinarianAuthController;
+use App\Http\Controllers\Password\ResetPasswordController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\MedicationNameController;
 use App\Http\Controllers\MedicationTypeController;
 use App\Http\Controllers\NotificationsHistoryController;
 use App\Http\Controllers\NotificationTokenController;
+use App\Http\Controllers\Password\CodeCheckController;
+use App\Http\Controllers\Password\ForgotPasswordController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\VeterinarianController;
 use App\Http\Controllers\VetNotificationTokenController;
+use App\Models\PetOwner;
 use Illuminate\Support\Facades\Route;
 
 // Route::get('/user', function (Request $request) {
@@ -39,8 +45,13 @@ Route::post('veterinarian/login', [VeterinarianAuthController::class, 'login']);
 Route::post('petowner/register', [PetOwnerAuthController::class, 'register']);
 Route::post('petowner/login', [PetOwnerAuthController::class, 'login']);
 
+Route::post('password/email', [ForgotPasswordController::class, '__invoke']);
+Route::post('password/code/check', [CodeCheckController::class, '__invoke']);
+Route::post('password/reset', [ResetPasswordController::class, '__invoke']);
 
 Route::middleware('auth:sanctum')->group(function() {
+    Route::post('/forgot-password', PetOwnerForgotPasswordController::class);
+    Route::post('/reset-password', PetOwnerResetPasswordController::class);
     // VETERINARIANS
     Route::post('veterinarian/profile', [VeterinarianAuthController::class, 'profile']);
     Route::post('veterinarian/logout', [VeterinarianAuthController::class, 'logout']);

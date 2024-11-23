@@ -11,4 +11,5 @@ class ResetCodePassword extends Model
         'code',
         'created_at',
     ];
+
 }
