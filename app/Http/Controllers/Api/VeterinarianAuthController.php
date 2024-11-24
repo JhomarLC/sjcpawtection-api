@@ -98,12 +98,17 @@ class VeterinarianAuthController extends Controller
         $veterinarian = Veterinarians::where('email', $request->email)->first();
 
         // Check if the veterinarian's status is approved
-        if ($veterinarian->status !== 'approved') {
+        if ($veterinarian->status === 'archived') {
+            return response()->json([
+                'message' => 'Your account is inactive, please contact administrator.',
+            ], 403);
+        }
+        // Check if the veterinarian's status is approved
+        if ($veterinarian->status !== 'approved' && $veterinarian->status !== 'archived') {
             return response()->json([
                 'message' => 'Your account is pending and requires administrator approval.',
             ], 403);
         }
-
         return response()->json([
             'message' => 'Veterinarian Logged In successfully!',
             'user' => $veterinarian,

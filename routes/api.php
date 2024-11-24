@@ -8,15 +8,18 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PetOwnerAuthController;
 // use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\VeterinarianAuthController;
-use App\Http\Controllers\Password\ResetPasswordController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\MedicationNameController;
 use App\Http\Controllers\MedicationTypeController;
 use App\Http\Controllers\NotificationsHistoryController;
 use App\Http\Controllers\NotificationTokenController;
+use App\Http\Controllers\Password\ResetPasswordController;
+use App\Http\Controllers\Password\Veterinarians\ResetPasswordController as VetResetPasswordController;
 use App\Http\Controllers\Password\CodeCheckController;
+use App\Http\Controllers\Password\Veterinarians\CodeCheckController as VetCodeCheckController;
 use App\Http\Controllers\Password\ForgotPasswordController;
+use App\Http\Controllers\Password\Veterinarians\ForgotPasswordController as VetForgotPasswordController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\PetOwnerController;
 use App\Http\Controllers\VeterinarianController;
@@ -48,6 +51,10 @@ Route::post('petowner/login', [PetOwnerAuthController::class, 'login']);
 Route::post('password/email', [ForgotPasswordController::class, '__invoke']);
 Route::post('password/code/check', [CodeCheckController::class, '__invoke']);
 Route::post('password/reset', [ResetPasswordController::class, '__invoke']);
+
+Route::post('veterinarians/password/email', [VetForgotPasswordController::class, '__invoke']);
+Route::post('veterinarians/password/code/check', [VetCodeCheckController::class, '__invoke']);
+Route::post('veterinarians/password/reset', [VetResetPasswordController::class, '__invoke']);
 
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('/forgot-password', PetOwnerForgotPasswordController::class);
