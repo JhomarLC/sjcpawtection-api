@@ -148,9 +148,6 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('/vet-notification/by-address', [VetNotificationTokenController::class, 'getByAddress']);
     Route::post('/vet-send-notif', [VetNotificationTokenController::class, 'sendNotification']);
 
-
-
     Route::get('notification-history', [NotificationsHistoryController::class, 'index']);
     Route::post('notification-history', [NotificationsHistoryController::class, 'store']);
-
 });
