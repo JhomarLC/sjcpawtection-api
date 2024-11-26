@@ -31,7 +31,7 @@ class MedicationController extends Controller
         }
 
         // Eager load relationships
-        $medications->with('pet', 'medicationname', 'veterinarian');
+        $medications->with('pet', 'medicationname.medtype', 'veterinarian');
 
         // Retrieve the medications
         $medications = $medications->get();
