@@ -20,12 +20,12 @@ class CodeCheckController extends Controller
         // Check if the code has expired (valid for 1 hour)
         if ($passwordReset->created_at->addHour()->isPast()) {
             $passwordReset->delete();
-            return response(['message' => trans('passwords.code_is_expire')], 422);
+            return response(['message' => trans('OTP is Expired!')], 422);
         }
 
         return response([
             'code' => $passwordReset->code,
-            'message' => trans('passwords.code_is_valid')
+            'message' => trans('OTP is Valid!')
         ], 200);
     }
 }

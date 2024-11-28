@@ -34,6 +34,6 @@ class ForgotPasswordController extends Controller
         // Send the code to the user's email
         Mail::to($request->email)->send(new SendCodeResetPassword($code));
 
-        return response(['message' => trans('passwords.sent')], 200);
+        return response(['message' => trans('OTP Sent!')], 200);
     }
 }
