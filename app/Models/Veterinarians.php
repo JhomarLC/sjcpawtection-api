@@ -22,7 +22,7 @@ class Veterinarians extends Authenticatable
         'position',
         'license_number',
         'phone_number',
-        'electronic_signature',
+        // 'electronic_signature',
     ];
 
     protected $hidden = [

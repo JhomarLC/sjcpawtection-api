@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('position', 100);
             $table->string('license_number', 50);
             $table->string('phone_number', 11);
-            $table->string('electronic_signature');
+            // $table->string('electronic_signature');
             $table->enum('status', ['pending', 'approved', 'declined', 'archived'])->default('pending');
             $table->rememberToken();
             $table->timestamps();
