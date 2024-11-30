@@ -100,7 +100,38 @@ class VeterinarianController extends Controller
             'vet' => $vet,
         ], 200);
     }
+    public function updateProfilePicture(Request $request, Veterinarians $vet)
+    {
+        // Validate the request, ensuring only the image is required
+        $validatedData = $request->validate([
+            'image' => 'required|file|mimes:jpeg,png,jpg,gif|max:10240',
+        ]);
 
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($vet->image && Storage::exists('public/vet_profiles/' . $vet->image)) {
+                Storage::delete('public/vet_profiles/' . $vet->image);
+            }
+
+            // Upload the new image
+            $file = $request->file('image');
+
+            $getfileExtension = $file->getClientOriginalExtension();
+            $createnewFileName = time() . '_' . 'vet' . '.' . $getfileExtension;
+            $file->storeAs('public/vet_profiles', $createnewFileName);
+
+            // Update the image field in the pet owner's record
+            $vet->update(['image' => $createnewFileName]);
+        }
+
+        // Return a success response with the updated profile picture details
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile picture updated successfully',
+            'veterinarian' => $vet,
+        ], 200);
+    }
 
 
     /**

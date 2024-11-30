@@ -70,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::put('veterinarians/{vet}/decline', [VeterinarianController::class, 'decline']);
     Route::put('veterinarians/{vet}/archive', [VeterinarianController::class, 'archive']);
     Route::post('veterinarians/{vet}', [VeterinarianController::class, 'update']);
+    Route::post('veterinarians/{vet}/profile', [VeterinarianController::class, 'updateProfilePicture']);
 
     // PET OWNERS
     Route::post('petowner/profile', [PetOwnerAuthController::class, 'profile']);
