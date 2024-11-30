@@ -14,93 +14,7 @@ use Illuminate\Validation\Rule;
 
 class PetOwnerController extends Controller
 {
-    /**
-    * Display a listing of the resource.
-    */
-    // public function index(Request $request)
-    // {
-    //     $search = $request->query('search');
-    //     $filter = $request->query('filter');
-    //     $count = $request->query('count');
 
-    //     $pet_owner_query = PetOwner::query();
-
-    //     if ($filter) {
-    //         $pet_owner_query->where('addr_brgy', 'like', '%' . $filter . '%');
-    //     }
-
-    //     if (!empty($search)) {
-    //         $pet_owner_query->where(function($query) use ($search) {
-    //             $query->where('name', 'like', '%' . $search . '%')
-    //                 ->orWhere('email', 'like', '%' . $search . '%');
-    //         });
-    //     }
-
-    //      // Variable to store the count result
-    //      $filteredCount = null;
-
-    //      // Implement the count logic if the 'count' parameter is provided
-    //      if (!empty($count)) {
-    //          $countQuery = $pet_owner_query;
-
-    //          $brgy = [
-    //             "A. Pascual",
-    //             "Abar Ist",
-    //             "Abar 2nd",
-    //             "Bagong Sikat",
-    //             "Caanawan",
-    //             "Calaocan",
-    //             "Camanacsacan",
-    //             "Culaylay",
-    //             "Dizol",
-    //             "Kaliwanagan",
-    //             "Kita-Kita",
-    //             "Malasin",
-    //             "Manicla",
-    //             "Palestina",
-    //             "Parang Mangga",
-    //             "Villa Joson",
-    //             "Pinili",
-    //             "Rafael Rueda, Sr. Pob.",
-    //             "Ferdinand E. Marcos Pob.",
-    //             "Canuto Ramos Pob.",
-    //             "Raymundo Eugenio Pob.",
-    //             "Crisanto Sanchez Pob.",
-    //             "Porais",
-    //             "San Agustin",
-    //             "San Juan",
-    //             "San Mauricio",
-    //             "Santo Niño 1st",
-    //             "Santo Niño 2nd",
-    //             "Santo Tomas",
-    //             "Sibut",
-    //             "Sinipit Bubon",
-    //             "Santo Niño 3rd",
-    //             "Tabulac",
-    //             "Tayabo",
-    //             "Tondod",
-    //             "Tulat",
-    //             "Villa Floresca",
-    //             "Villa Marina"
-    //          ];
-
-    //          // Filter by the specified count type
-    //          if (in_array($count, ['All', ...$brgy])) {
-    //              $countQuery->where('status', $count);
-    //          }
-
-    //          // Get the count
-    //          $filteredCount = $countQuery->count();
-
-    //          // Return the paginated results as a resource collection, along with the filtered count if applicable
-    //          return response()->json([
-    //              'filtered_count' => $filteredCount, // Null if no count query is provided
-    //          ]);
-    //      }
-    //     return PetOwnerResource::collection(
-    //         $pet_owner_query->latest()->get(),
-    //     );
-    // }
 
     public function index(Request $request)
     {
@@ -306,6 +220,37 @@ class PetOwnerController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Details updated successfully',
+            'petowner' => $petowner,
+        ], 200);
+    }
+    public function updateProfilePicture(Request $request, PetOwner $petowner)
+    {
+        // Validate the request, ensuring only the image is required
+        $validatedData = $request->validate([
+            'image' => 'required|file|mimes:jpeg,png,jpg,gif|max:10240',
+        ]);
+
+        // Handle image upload
+        if ($request->hasFile('image')) {
+            // Delete the old image if it exists
+            if ($petowner->image && Storage::exists('public/petowners_profile/' . $petowner->image)) {
+                Storage::delete('public/petowners_profile/' . $petowner->image);
+            }
+
+            // Upload the new image
+            $file = $request->file('image');
+            $getfileExtension = $file->getClientOriginalExtension();
+            $createnewFileName = time() . '_' . 'petowner' . '.' . $getfileExtension;
+            $file->storeAs('public/petowners_profile', $createnewFileName);
+
+            // Update the image field in the pet owner's record
+            $petowner->update(['image' => $createnewFileName]);
+        }
+
+        // Return a success response with the updated profile picture details
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Profile picture updated successfully',
             'petowner' => $petowner,
         ], 200);
     }

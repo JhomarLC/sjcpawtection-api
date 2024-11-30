@@ -78,6 +78,7 @@ Route::middleware('auth:sanctum')->group(function() {
     Route::get('petowners', [PetOwnerController::class, 'index']);
     Route::get('petowners/{petowner}', [PetOwnerController::class, 'show']);
     Route::post('petowners/{petowner}', [PetOwnerController::class, 'update']);
+    Route::post('petowners/{petowner}/profile', [PetOwnerController::class, 'updateProfilePicture']);
     Route::get('petowners-all-data', [PetOwnerController::class, 'getPetOwnersWithPetsAndMedications']);
 
     // PET
