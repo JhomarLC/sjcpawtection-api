@@ -36,163 +36,133 @@ class PetController extends Controller
             $pets->get()
         );
     }
+    public function indexchart(Request $request)
+{
+    $search = $request->query('search');
+    $filter = $request->query('filter'); // Filter by barangay
+    $count = $request->query('count', 'All'); // "All" or specific barangay
+    $type = $request->query('type', 'monthly'); // "monthly" or "yearly"
+    $pettype = $request->query('pettype', 'All'); // "All", "Dog" or "Cat"
+    $medication_id = $request->query('medication', 1);
 
-        public function indexchart(Request $request)
-        {
-            $search = $request->query('search');
-            $filter = $request->query('filter'); // Filter by address barangay
-            $count = $request->query('count', 'All'); // "All" or specific barangay
-            $type = $request->query('type', 'monthly'); // "monthly" or "yearly"
-            $pettype = $request->query('pettype', 'All'); // "All", "Dog" or "Cat"
+    $startOfThisYear = Carbon::now()->startOfYear();
+    $endOfThisYear = Carbon::now()->endOfYear();
 
-            $petOwnerQuery = PetOwner::query();
-
-            // Apply address filter if provided
-            if (!empty($filter)) {
-                $petOwnerQuery->where('addr_brgy', 'like', '%' . $filter . '%');
-            }
-
-            // Search for owners if search is provided
-            if (!empty($search)) {
-                $petOwnerQuery->where(function ($query) use ($search) {
-                    $query->where('name', 'like', '%' . $search . '%')
-                        ->orWhere('email', 'like', '%' . $search . '%');
-                });
-            }
-
-            // Define start and end of the current year
-            $startOfThisYear = Carbon::now()->startOfYear()->toDateString(); // January 1st of this year
-            $endOfThisYear = Carbon::now()->endOfYear()->toDateString();     // December 31st of this year
-
-            // Calculate total pets with the specific medication
-            $totalMedicationPetsQuery = Pet::query()
-                ->where(function ($query) use ($pettype) {
-                    if ($pettype !== 'All') {
-                        $query->where('pet_type', $pettype); // Filter by pet type
-                    }
-                })
-                ->whereHas('medications', function ($query) use ($startOfThisYear, $endOfThisYear){
-                    $query->where('medication_name_id', 1)
-                    ->whereBetween('medication_date', [$startOfThisYear, $endOfThisYear]); // Filter pets with specific medication
-                })
-                ->whereHas('petowner', function ($query) use ($filter, $count) {
-                    if (!empty($filter)) {
-                        $query->where('addr_brgy', 'like', '%' . $filter . '%');
-                    }
-                    if (!empty($count) && $count !== 'All') {
-                        $query->where('addr_brgy', $count);
-                    }
-                });
-
-            $totalCount = $totalMedicationPetsQuery->count();
-
-            // Get date range for monthly or yearly statistics
-            $firstRecord = Pet::whereHas('medications', function ($query) {
-                $query->where('medication_name_id', 1);
-            })->orderBy('created_at', 'asc')->first();
-
-            if (!$firstRecord) {
-                return response()->json([
-                    'categories' => [],
-                    'data' => [],
-                    'total_count' => $totalCount,
-                ]);
-            }
-
-            $firstDate = Carbon::parse($firstRecord->created_at)->subYear();
-            $currentDate = Carbon::now();
-
-            if ($type === 'yearly') {
-                // Yearly stats
-                $yearlyStats = collect([]);
-
-                for ($year = $firstDate->year; $year <= $currentDate->year; $year++) {
-                    $startOfYear = Carbon::createFromDate($year, 1, 1)->startOfYear();
-                    $endOfYear = Carbon::createFromDate($year, 1, 1)->endOfYear();
-
-                    logger("Start of year: " . $startOfYear->toDateString());
-                    logger("End of year: " . $endOfYear->toDateString());
-
-                    $yearlyCount = Pet::query()
-                        ->where(function ($query) use ($pettype) {
-                            if ($pettype !== 'All') {
-                                $query->where('pet_type', $pettype); // Filter by pet type
-                            }
-                        })
-                        ->whereHas('medications', function ($query) use ($startOfYear, $endOfYear) {
-                            $query->where('medication_name_id', 1)
-                                    ->whereBetween('medication_date', [$startOfYear, $endOfYear]);
-                        })
-                        ->whereHas('petowner', function ($query) use ($filter, $count) {
-                            if (!empty($filter)) {
-                                $query->where('addr_brgy', 'like', '%' . $filter . '%');
-                            }
-                            if (!empty($count) && $count !== 'All') {
-                                $query->where('addr_brgy', $count);
-                            }
-                        })
-                        ->count();
-
-                    $yearlyStats->push([
-                        'year' => $year,
-                        'count' => $yearlyCount,
-                    ]);
-                }
-
-                $categories = $yearlyStats->pluck('year');
-                $data = $yearlyStats->pluck('count');
-
-                return response()->json([
-                    'categories' => $categories,
-                    'data' => $data,
-                    'total_count' => $totalCount,
-                ]);
-            } else {
-                // Monthly stats
-                $monthlyStats = collect([]);
-
-                for ($i = 0; $i < 12; $i++) {
-                    $startOfMonth = $currentDate->copy()->startOfYear()->addMonths($i);
-                    $endOfMonth = $startOfMonth->copy()->endOfMonth();
-
-                    if ($startOfMonth->gt($currentDate)) break;
-
-                    $monthlyCount = Pet::query()
-                        ->where(function ($query) use ($pettype) {
-                            if ($pettype !== 'All') {
-                                $query->where('pet_type', $pettype); // Filter by pet type
-                            }
-                        })
-                        ->whereHas('medications', function ($query) use ($startOfMonth, $endOfMonth){
-                            $query->where('medication_name_id', 1)
-                                ->whereBetween('medication_date', [$startOfMonth, $endOfMonth]);
-                        })
-                        ->whereHas('petowner', function ($query) use ($filter, $count) {
-                            if (!empty($filter)) {
-                                $query->where('addr_brgy', 'like', '%' . $filter . '%');
-                            }
-                            if (!empty($count) && $count !== 'All') {
-                                $query->where('addr_brgy', $count);
-                            }
-                        })
-                        ->count();
-
-                    $monthlyStats->push([
-                        'month' => $startOfMonth->format('M'),
-                        'count' => $monthlyCount,
-                    ]);
-                }
-
-                $categories = $monthlyStats->pluck('month');
-                $data = $monthlyStats->pluck('count');
-
-                return response()->json([
-                    'categories' => $categories,
-                    'data' => $data,
-                    'total_count' => $totalCount,
-                ]);
-            }
+    // Helper function to apply filters
+    $applyFilters = function ($query) use ($filter, $count, $pettype) {
+        if ($pettype !== 'All') {
+            $query->where('pet_type', $pettype);
         }
+        $query->whereHas('petowner', function ($query) use ($filter, $count) {
+            if (!empty($filter)) {
+                $query->where('addr_brgy', 'like', '%' . $filter . '%');
+            }
+            if (!empty($count) && $count !== 'All') {
+                $query->where('addr_brgy', $count);
+            }
+        });
+    };
+
+    // Total pets with the specific medication
+    $petsWithMedicationQuery = Pet::query();
+    $applyFilters($petsWithMedicationQuery);
+    $petsWithMedicationQuery->whereHas('medications', function ($query) use ($medication_id, $startOfThisYear, $endOfThisYear) {
+        $query->where('medication_name_id', $medication_id)
+            ->whereBetween('medication_date', [$startOfThisYear, $endOfThisYear]);
+    });
+    $totalCount = $petsWithMedicationQuery->count();
+
+    // Total pets regardless of medication
+    $totalPetsQuery = Pet::query();
+    $applyFilters($totalPetsQuery);
+    $totalPetCount = $totalPetsQuery->count();
+
+    // If no data, return early
+    if ($totalPetCount === 0) {
+        return response()->json([
+            'categories' => [],
+            'data' => [],
+            'total_count' => $totalCount,
+            'total_pet_count' => $totalPetCount,
+        ]);
+    }
+
+    // Get date range for chart (Yearly or Monthly)
+    $firstRecord = Pet::query()->orderBy('created_at', 'asc')->first();
+    if (!$firstRecord) {
+        return response()->json([
+            'categories' => [],
+            'data' => [],
+            'total_count' => $totalCount,
+            'total_pet_count' => $totalPetCount,
+        ]);
+    }
+
+    $firstDate = Carbon::create(2023, 1, 1)->startOfYear(); // Start from 2023
+    $currentDate = Carbon::now();
+
+    $categories = [];
+    $data = [];
+
+    if ($type === 'yearly') {
+        // Yearly data generation
+        $yearlyStats = collect();
+
+        for ($year = 2023; $year <= $currentDate->year; $year++) { // Start explicitly from 2023
+            $startOfYear = Carbon::create($year, 1, 1)->startOfYear();
+            $endOfYear = Carbon::create($year, 1, 1)->endOfYear();
+
+            $yearlyCount = Pet::query();
+            $applyFilters($yearlyCount);
+            $yearlyCount->whereHas('medications', function ($query) use ($medication_id, $startOfYear, $endOfYear) {
+                $query->where('medication_name_id', $medication_id)
+                    ->whereBetween('medication_date', [$startOfYear, $endOfYear]);
+            });
+
+            $yearlyStats->push([
+                'year' => $year,
+                'count' => $yearlyCount->count(),
+            ]);
+        }
+
+        $categories = $yearlyStats->pluck('year');
+        $data = $yearlyStats->pluck('count');
+    } else {
+        // Monthly data generation
+        $monthlyStats = collect();
+
+        for ($i = 0; $i < 12; $i++) {
+            $startOfMonth = $currentDate->copy()->startOfYear()->addMonths($i);
+            $endOfMonth = $startOfMonth->copy()->endOfMonth();
+
+            if ($startOfMonth->gt($currentDate)) break;
+
+            $monthlyCount = Pet::query();
+            $applyFilters($monthlyCount);
+            $monthlyCount->whereHas('medications', function ($query) use ($medication_id, $startOfMonth, $endOfMonth) {
+                $query->where('medication_name_id', $medication_id)
+                    ->whereBetween('medication_date', [$startOfMonth, $endOfMonth]);
+            });
+
+            $monthlyStats->push([
+                'month' => $startOfMonth->format('M'),
+                'count' => $monthlyCount->count(),
+            ]);
+        }
+
+        $categories = $monthlyStats->pluck('month');
+        $data = $monthlyStats->pluck('count');
+    }
+
+    return response()->json([
+        'categories' => $categories,
+        'data' => $data,
+        'total_count' => $totalCount,
+        'total_pet_count' => $totalPetCount,
+        'percentage'=> $totalCount / $totalPetCount * 100,
+    ]);
+}
+
 
    public function indexchart2(Request $request)
     {

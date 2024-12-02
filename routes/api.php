@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\PetOwnerAuthController;
 // use App\Http\Controllers\Api\ResetPasswordController;
 use App\Http\Controllers\Api\VeterinarianAuthController;
 use App\Http\Controllers\EventController;
+use App\Http\Controllers\FCMController;
 use App\Http\Controllers\MedicationController;
 use App\Http\Controllers\MedicationNameController;
 use App\Http\Controllers\MedicationTypeController;
@@ -56,6 +57,8 @@ Route::post('veterinarians/password/email', [VetForgotPasswordController::class,
 Route::post('veterinarians/password/code/check', [VetCodeCheckController::class, '__invoke']);
 Route::post('veterinarians/password/reset', [VetResetPasswordController::class, '__invoke']);
 
+Route::post('send-notification', [FCMController::class, 'sendNotification']);
+
 Route::middleware('auth:sanctum')->group(function() {
     Route::post('/forgot-password', PetOwnerForgotPasswordController::class);
     Route::post('/reset-password', PetOwnerResetPasswordController::class);
@@ -98,6 +101,8 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // MEDICATIONS
     Route::get('pets/{pet}/medications', [MedicationController::class, 'index']);
+    Route::get('pets/medications/fee', [MedicationController::class, 'getTodayMedicationFeesForAll']);
+    Route::get('pets/medications/fee/chart', [MedicationController::class, 'indexFeesChart']);
     Route::post('pets/{pet}/medications', [MedicationController::class, 'store']);
     Route::get('pets/{pet}/medications/{medication}', [MedicationController::class, 'show']);
 
