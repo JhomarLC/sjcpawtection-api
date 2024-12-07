@@ -73,7 +73,8 @@ class PetController extends Controller
     $totalCount = $petsWithMedicationQuery->count();
 
     // Total pets regardless of medication
-    $totalPetsQuery = Pet::query();
+    $totalPetsQuery = Pet::query()
+    ->where('status', 'approved');
     $applyFilters($totalPetsQuery);
     $totalPetCount = $totalPetsQuery->count();
 
@@ -88,7 +89,11 @@ class PetController extends Controller
     }
 
     // Get date range for chart (Yearly or Monthly)
-    $firstRecord = Pet::query()->orderBy('created_at', 'asc')->first();
+    $firstRecord = Pet::query()
+      ->where('status', 'approved')
+      ->orderBy('created_at', 'asc')
+      ->first();
+
     if (!$firstRecord) {
         return response()->json([
             'categories' => [],

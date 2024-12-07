@@ -14,7 +14,7 @@ class MedicationNameSeeder extends Seeder
     public function run(): void
     {
         $dogVaccineList = [
-            "Rabies",
+            "Anti-Rabies",
             "Parvoviridae",
             "Distemper",
             "Canine influenza",
@@ -34,7 +34,6 @@ class MedicationNameSeeder extends Seeder
             "Canine adenovirus 2",
             "Dhpp, leptospirosis, rabies",
             "Giardia",
-            "Heartworm"
         ];
 
         $dogDewormingList = [
@@ -43,13 +42,6 @@ class MedicationNameSeeder extends Seeder
             "Whipworm",
             "Tapeworm",
             "Heartworm",
-            "Lungworm",
-            "Coccidia",
-            "Giardia",
-            "Strongyloides",
-            "Toxocariasis",
-            "Trichuris",
-            "Filaria"
         ];
 
         foreach ($dogVaccineList as $name) {
