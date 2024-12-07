@@ -23,6 +23,7 @@ use App\Http\Controllers\Password\ForgotPasswordController;
 use App\Http\Controllers\Password\Veterinarians\ForgotPasswordController as VetForgotPasswordController;
 use App\Http\Controllers\PetController;
 use App\Http\Controllers\PetOwnerController;
+use App\Http\Controllers\VerifyEmailController;
 use App\Http\Controllers\VeterinarianController;
 use App\Http\Controllers\VetNotificationTokenController;
 use App\Models\PetOwner;
@@ -48,6 +49,11 @@ Route::post('veterinarian/login', [VeterinarianAuthController::class, 'login']);
 // PET OWNERS
 Route::post('petowner/register', [PetOwnerAuthController::class, 'register']);
 Route::post('petowner/login', [PetOwnerAuthController::class, 'login']);
+
+Route::post('send-verification-email', [VerifyEmailController::class, 'send']);
+Route::post('verify-verification-email', [VerifyEmailController::class, 'verify']);
+Route::post('vet-send-verification-email', [VerifyEmailController::class, 'sendVet']);
+Route::post('vet-verify-verification-email', [VerifyEmailController::class, 'verifyVet']);
 
 Route::post('password/email', [ForgotPasswordController::class, '__invoke']);
 Route::post('password/code/check', [CodeCheckController::class, '__invoke']);
