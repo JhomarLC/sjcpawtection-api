@@ -66,6 +66,8 @@ class VeterinarianController extends Controller
         // Validate the request, including the image
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
+            'addr_zone' => 'required|string|max:50',
+            'addr_brgy' => 'required|string|max:50',
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:10240',
             'position' => 'required|string|max:50',
             'license_number' => 'required|string|max:50',

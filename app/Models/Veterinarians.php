@@ -18,6 +18,8 @@ class Veterinarians extends Authenticatable
         'email',
         'image',
         'password',
+        'addr_zone',
+        'addr_brgy',
         'status',
         'position',
         'license_number',
