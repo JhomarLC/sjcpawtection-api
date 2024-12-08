@@ -74,10 +74,9 @@ class PetController extends Controller
 
     public function getNextVaccination(Request $request, Pet $pet)
     {
-        $today = now(); // Get today's date
         $pet_medications = $pet->medications()
             ->with('medicationname.medtype')
-            ->where('next_vaccination', '>=', $today) // Filter for upcoming vaccinations
+            ->where('next_vaccination', '>=', Carbon::now()->toDateString()) // Filter for upcoming vaccinations
             ->orderBy('next_vaccination', 'asc') // Sort by date for clarity
             ->get();
 
