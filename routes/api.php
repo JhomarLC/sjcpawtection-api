@@ -93,6 +93,7 @@ Route::middleware('auth:sanctum')->group(function() {
 
     // PET
     Route::get('petowners/{petowner}/pets', [PetController::class, 'index']);
+    Route::get('petowners/{petowner}/pets-with-medications', [PetController::class, 'petsWithMedication']);
     Route::get('getchart', [PetController::class, 'indexchart']);
     Route::get('getchart2', [PetController::class, 'indexchart2']);
     Route::post('petowners/{petowner}/pets', [PetController::class, 'store']);
