@@ -60,7 +60,7 @@ class Pet extends Model
             return 'less than a day old';
         }
 
-        return !empty($ageParts) ? implode(' and ', $ageParts) . ' old' : 'unknown age';
+        return !empty($ageParts) ? implode(' and ', $ageParts) . ' old' : 'less than a day old';
     }
 
 }
