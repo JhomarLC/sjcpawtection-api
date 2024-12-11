@@ -56,6 +56,8 @@ class PetController extends Controller
                 return [
                     'name' => $pet->name,
                     'breed' => $pet->breed,
+                    'petype' => $pet->pet_type,
+                    'gender' => $pet->gender,
                     'medications' => $pet->medications->map(function ($medication) {
                         return [
                             'medication_name' => $medication->medicationname->name ?? 'N/A',
@@ -387,6 +389,30 @@ class PetController extends Controller
         $pet->load('petowner');
         return new PetResource($pet);
     }
+
+    public function updateWeightAndSize(Request $request, PetOwner $petowner, $petId)
+    {
+        // Validate the request
+        $validatedData = $request->validate([
+            'size' => 'required|string|max:100',
+            'weight' => 'required|numeric',
+        ]);
+
+        // Find the pet belonging to the specified pet owner
+        $pet = $petowner->pets()->findOrFail($petId);
+
+        // Update only the size and weight attributes
+        $pet->update([
+            'size' => $validatedData['size'],
+            'weight' => $validatedData['weight'],
+        ]);
+
+        // Reload the relationship to ensure updated data is returned
+        $pet->load('petowner');
+
+        return new PetResource($pet);
+    }
+
 
     /**
      * Display the specified resource.
