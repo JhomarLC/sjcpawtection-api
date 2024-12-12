@@ -22,7 +22,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             MedicationTypeSeeder::class,
-            MedicationNameSeeder::class
+            // MedicationNameSeeder::class
         ]);
     }
 }
